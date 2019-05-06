@@ -1,17 +1,33 @@
-var express = require('express');
-var app = express();
-
+const express = require('express');
+const app = express();
+// const json = require('jsonfile');
 const bodyParser = require('body-parser');
 
-require('./configs/database');
-
-var personsRouter = require('./routes/personsRoute');
+const DB = require('./utils/DB');
 
 app.use(bodyParser.urlencoded({extended : true}))
 app.use(bodyParser.json());
 
+DB.connectAndFetchData()
+    .then( status => {
+        console.log(status);
+    });
 
-app.use('/api/persons',personsRouter);
+const UserModel = require('./models/userModel');
+const userRouter = require('./routes/userRoute')(UserModel);
+app.use('/api/users',userRouter);
 
-app.listen(8001);
-console.log('Server is running...')
+const server = app.listen(8002);
+console.log('Server is running...');
+
+/**
+ * @link:https://hackernoon.com/graceful-shutdown-in-nodejs-2f8f59d1c357
+ */
+process.on('SIGINT', () => {
+    console.info('Stopping Server - SIGINT signal received.');
+    server.close( () => {
+        console.log('Http server closed.');
+    });
+
+    DB.dropAndDisconnectGracefully();
+});
