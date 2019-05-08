@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 
 const DB = require('./utils/DB');
 
+console.log(process.argv);
 app.use(bodyParser.urlencoded({extended : true}))
 app.use(bodyParser.json());
 
@@ -24,10 +25,13 @@ console.log('Server is running...');
  * @link:https://hackernoon.com/graceful-shutdown-in-nodejs-2f8f59d1c357
  */
 process.on('SIGINT', () => {
-    console.info('Stopping Server - SIGINT signal received.');
-    server.close( () => {
-        console.log('Http server closed.');
-    });
-
-    DB.dropAndDisconnectGracefully();
+    console.info('SIGINT signal received - Exiting.');
+    // DB.dropAndDisconnectGracefully().
+    DB.disconnectGracefully().
+        then( () => {
+        server.close( () => {
+            console.log('Http server closed.');
+            process.exit(0);
+        });
+    })
 });

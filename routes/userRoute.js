@@ -12,6 +12,23 @@ function routes(UserModel) {
         });
     });
 
+    userRouter.route('/:id').get(function (req, resp) {
+        UserModel.findById(req.params.id, {},{},
+            (err, user) => {
+            if (err) {
+                return resp.send(err);
+            }
+            if (user) {
+                return resp.json(user);
+            }
+            return resp.sendStatus(404);
+        });
+
+    });
+
+    /**
+     * POST will create new user with {name,username,email} only.
+     */
     userRouter.route('/').post(function (req, resp) {
         const newUser = new UserModel({
             name: req.body.name,
@@ -21,60 +38,72 @@ function routes(UserModel) {
 
         newUser.save(function (err) {
             if (err) {
-                resp.send(err);
+                return resp.send(err);
             }
-            resp.send('Person Created !')
+            return resp.json(newUser);
         });
 
     });
 
+    /**
+     * PUT will replace {name,username,email} only.
+     */
     userRouter.route('/:id').put(function (req, resp) {
-        const { user } = req;
-        user.name = req.body.name;
-        user.username = req.body.username;
-        user.email = req.body.email;
+        let updatingObj = {
+            name: req.body.name,
+            username: req.body.username,
+            email: req.body.email
+        };
         UserModel.findByIdAndUpdate(req.params.id,
-            {
-                name: req.body.name,
-                username: req.body.username,
-                email: req.body.email
-            },
-            function (err, per) {
+            updatingObj,
+            {new:true,upsert: true},
+            function (err, updatedUser) {
                 if (err) {
                     return resp.send(err);
                 }
-                return resp.send('Updated !');
+                return resp.json(updatedUser);
+            });
+    });
+
+    /**
+     * PATCH will replace whatever fields.
+     */
+    userRouter.route('/:id').patch(function (req, resp) {
+
+        let key,value;
+        let updatingObj = {};
+        if( req.body._id) {
+            delete req.body._id;
+        }
+        Object.entries(req.body).forEach(item => {
+            key = item[0];
+            value = item[1];
+            updatingObj[key] = value;
+        });
+
+        UserModel.findByIdAndUpdate(req.params.id,
+            updatingObj,
+            {new:true,upsert: true},
+            function (err, updatedUser) {
+                if (err) {
+                    return resp.send(err);
+                }
+                return resp.json(updatedUser);
             });
     });
 
     userRouter.route('/:id').delete(function (req, resp) {
         UserModel.findByIdAndDelete(req.params.id,
-            function (err, per) {
+            {},
+            function (err, deletedUser) {
                 if (err) {
                     return resp.send(err);
                 }
-                return resp.send('Deleted !');
+                // TODO! delete related todos
+                // TODO! delete related posts
+                return resp.json(deletedUser);
+                // return resp.send('Deleted !');
             });
-    });
-
-    // middleware for '/:id' routes  to attach target user
-    // to req object once
-    userRouter.use('/:id', (req, res, next) => {
-        UserModel.findById(req.params.id, (err, user) => {
-            if (err) {
-                return res.send(err);
-            }
-            if (user) {
-                req.user = user;
-                return next();
-            }
-            return res.sendStatus(404);
-        });
-    })
-
-    userRouter.route('/:id').get(function (req, resp) {
-        const { user } = req;
-        return resp.json(user);
     });
 
     return userRouter;
