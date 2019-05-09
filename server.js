@@ -16,7 +16,11 @@ DB.connectAndFetchData()
 
 const UserModel = require('./models/userModel');
 const userRouter = require('./routes/userRoute')(UserModel);
+const TodoModel = require('./models/todoModel');
+const todoRouter = require('./routes/todoRoute')(TodoModel);
+
 app.use('/api/users',userRouter);
+app.use('/api/todos',todoRouter);
 
 const server = app.listen(8002);
 console.log('Server is running...');

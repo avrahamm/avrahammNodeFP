@@ -4,7 +4,6 @@ function routes(ItemModel) {
     const ItemRouter = express.Router();
     ItemRouter.route('/').get(function (req, resp) {
         ItemModel.find({}, function (err, items) {
-            // console.log(users);
             if (err) {
                 return resp.send(err);
             }
@@ -30,17 +29,17 @@ function routes(ItemModel) {
      * POST will create new item with predefined item fields set only.
      */
     ItemRouter.route('/').post(function (req, resp) {
-        const newItem = new ItemModel({ //Item specific structure
-            name: req.body.name,
-            username: req.body.username,
-            email: req.body.email
+        const newTodo = new ItemModel({ //Item specific structure
+            userId: req.body.userId,
+            title: req.body.title,
+            completed: req.body.completed
         });
 
-        newItem.save(function (err) {
+        newTodo.save(function (err) {
             if (err) {
                 return resp.send(err);
             }
-            return resp.json(newItem);
+            return resp.json(newTodo);
         });
 
     });
@@ -50,9 +49,9 @@ function routes(ItemModel) {
      */
     ItemRouter.route('/:id').put(function (req, resp) {
         let updatingObj = { //Item specific structure
-            name: req.body.name,
-            username: req.body.username,
-            email: req.body.email
+            userId: req.body.userId,
+            title: req.body.title,
+            completed: req.body.completed
         };
         ItemModel.findByIdAndUpdate(req.params.id,
             updatingObj,
@@ -99,13 +98,11 @@ function routes(ItemModel) {
                 if (err) {
                     return resp.send(err);
                 }
-                // User specific
-                // TODO! delete related todos
-                // TODO! delete related posts
                 return resp.json(deletedItem);
                 // return resp.send('Deleted !');
             });
     });
+
     return ItemRouter;
 }
 
