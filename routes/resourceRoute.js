@@ -1,6 +1,8 @@
 const express = require('express');
 
-function routes(ItemModel) {
+const LogHelper = require('../routes/helpers/LogHelper');
+
+function routes(ItemModel, ItemHelper) {
     const ItemRouter = express.Router();
     ItemRouter.route('/').get(function (req, resp) {
         ItemModel.find({}, function (err, items) {
@@ -22,37 +24,28 @@ function routes(ItemModel) {
             }
             return resp.sendStatus(404);
         });
-
     });
 
     /**
      * POST will create new item with predefined item fields set only.
      */
     ItemRouter.route('/').post(function (req, resp) {
-        const newTodo = new ItemModel({ //Item specific structure
-            userId: req.body.userId,
-            title: req.body.title,
-            completed: req.body.completed
-        });
-
-        newTodo.save(function (err) {
-            if (err) {
+        const newItem = ItemHelper.getNewItem(req,ItemModel); //Item specific structure
+        newItem.save()
+            .then( createdItem => {
+                LogHelper.logPostAction(createdItem);
+                return resp.json(createdItem);
+            })
+            .catch(err => {
                 return resp.send(err);
-            }
-            return resp.json(newTodo);
-        });
-
+            })
     });
 
     /**
      * PUT will replace predefined item fields set only.
      */
     ItemRouter.route('/:id').put(function (req, resp) {
-        let updatingObj = { //Item specific structure
-            userId: req.body.userId,
-            title: req.body.title,
-            completed: req.body.completed
-        };
+        const updatingObj = ItemHelper.getUpdatingItem(req); //Item specific structure
         ItemModel.findByIdAndUpdate(req.params.id,
             updatingObj,
             {new:true,upsert: true},
@@ -60,6 +53,7 @@ function routes(ItemModel) {
                 if (err) {
                     return resp.send(err);
                 }
+                LogHelper.logPutAction(updatedItem);
                 return resp.json(updatedItem);
             });
     });
@@ -87,6 +81,7 @@ function routes(ItemModel) {
                 if (err) {
                     return resp.send(err);
                 }
+                LogHelper.logPatchAction(updatedItem);
                 return resp.json(updatedItem);
             });
     });
@@ -98,11 +93,11 @@ function routes(ItemModel) {
                 if (err) {
                     return resp.send(err);
                 }
+                ItemHelper.deleteRelatedItems(req);
+                LogHelper.logDeleteAction(deletedItem);
                 return resp.json(deletedItem);
-                // return resp.send('Deleted !');
             });
     });
-
     return ItemRouter;
 }
 

@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const DB = require('./utils/DB');
 
 console.log(process.argv);
-app.use(bodyParser.urlencoded({extended : true}))
+app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 
 DB.connectAndFetchData()
@@ -15,12 +15,20 @@ DB.connectAndFetchData()
     });
 
 const UserModel = require('./models/userModel');
-const userRouter = require('./routes/userRoute')(UserModel);
-const TodoModel = require('./models/todoModel');
-const todoRouter = require('./routes/todoRoute')(TodoModel);
+const userHelper = require('./routes/helpers/userHelper');
+const userRouter = require('./routes/resourceRoute')(UserModel,userHelper);
 
-app.use('/api/users',userRouter);
-app.use('/api/todos',todoRouter);
+const TodoModel = require('./models/todoModel');
+const TodoHelper = require('./routes/helpers/todoHelper');
+const todoRouter = require('./routes/resourceRoute')(TodoModel,TodoHelper);
+
+const postModel = require('./models/postModel');
+const PostHelper = require('./routes/helpers/postHelper');
+const postRouter = require('./routes/resourceRoute')(postModel,PostHelper);
+
+app.use('/api/v1/users',userRouter);
+app.use('/api/v1/todos',todoRouter);
+app.use('/api/v1/posts',postRouter);
 
 const server = app.listen(8002);
 console.log('Server is running...');
