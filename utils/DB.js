@@ -4,6 +4,7 @@ const DAL = require("./DAL");
 const userModel = require('../models/userModel');
 const todoModel = require('../models/todoModel');
 const postModel = require('../models/postModel');
+const LogHelper = require('./LogHelper');
 
 function connectAndFetchData() {
     return connectToDB()
@@ -13,11 +14,14 @@ function connectAndFetchData() {
                     return "";
                 }
                 else {  // no data - go fetch
-                    return initDBWithData();
+                    return initDBWithData()
+                        .then( usersMongoIds => {
+                            return LogHelper.initUserLogFiles(usersMongoIds);
+                        })
                 }
             });
         })
-        .then( () => {
+        .then( ( ) => {
             return "DB Ready";
         })
         .catch( (err) => {
@@ -45,6 +49,7 @@ function initDBWithData() {
     let usersData = [];
     let todosData = [];
     let postsData = [];
+    let userIdToMongoIdMapping = [];
 
     let usersPromise = DAL.getData('https://jsonplaceholder.typicode.com/users');
     let todosPromise = DAL.getData('https://jsonplaceholder.typicode.com/todos');
@@ -62,13 +67,13 @@ function initDBWithData() {
             return userModel.find({}, '_id id')
         })
         .then(users => {
-            let userIdToMongoIdMapping = [];
             users.forEach(user => {
                 userIdToMongoIdMapping[user.id] = user._id;
                 console.log("user._id =" + user._id + ", user.id =" + user.id);
-            })
+            });
             // resolve mapping array
-            return Promise.resolve(userIdToMongoIdMapping);
+            // return Promise.resolve(userIdToMongoIdMapping);
+            return userIdToMongoIdMapping;
         })
         .then(userIdToMongoIdMapping => {
             // replace original userId with user document _id for todos and posts.
@@ -77,7 +82,7 @@ function initDBWithData() {
             });
             postsData.forEach(post => {
                 post.userId = userIdToMongoIdMapping[post.userId];
-            })
+            });
             // store todos and posts with updated userId values.
             return Promise.all([
                 insertDataToModel(todoModel, todosData),
@@ -86,6 +91,7 @@ function initDBWithData() {
         })
         .then(() => {
             console.log("userId was replaced with user._id successfully!");
+            return userIdToMongoIdMapping;
         })
         .catch(error => {
             console.log(error);

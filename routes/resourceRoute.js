@@ -1,6 +1,6 @@
 const express = require('express');
 
-const LogHelper = require('../routes/helpers/LogHelper');
+const LogHelper = require('../utils/LogHelper');
 
 function routes(ItemModel, ItemHelper) {
     const ItemRouter = express.Router();
