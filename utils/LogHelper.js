@@ -31,19 +31,19 @@ function initUserLogFiles(usersMongoIds) {
         })
 }
 
-function logPostAction(createdItem) {
+async function logPostAction(createdItem) {
 
 }
 
-function logPutAction(updatedItem) {
+async function logPutAction( oldItem, updatedItem ) {
 
 }
 
-function logPatchAction(updatedItem) {
+async function logPatchAction( oldItem, updatedItem ) {
 
 }
 
-function logDeleteAction(updatedItem) {
+async function logDeleteAction( deletedItem ) {
 
 }
 

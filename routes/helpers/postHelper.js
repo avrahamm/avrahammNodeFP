@@ -14,8 +14,6 @@ function getUpdatingItem( req ) {
     return postObj;
 }
 
-function deleteRelatedItems(req) {
-
-}
+function deleteRelatedItems(req,resp) {}
 
 module.exports = { getNewItem, getUpdatingItem, deleteRelatedItems };

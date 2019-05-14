@@ -1,3 +1,7 @@
+const TodoModel = require('../../models/todoModel');
+const PostModel = require('../../models/postModel');
+
+
 function getNewItem( req,ItemModel ) {
     const newUser = new ItemModel(//Item specific structure
         getUpdatingItem( req )
@@ -14,10 +18,15 @@ function getUpdatingItem( req ) {
     return userObj;
 }
 
-function deleteRelatedItems(req) {
+function deleteRelatedItems(req,resp) {
     // User specific
-    // TODO! delete related todos
-    // TODO! delete related posts
+    return TodoModel.deleteMany({userId: req.params.id })
+        .then( () => {
+            return PostModel.deleteMany({userId: req.params.id })
+        })
+        .catch( err => {
+            return resp.send(err);
+        })
 }
 
 module.exports = { getNewItem, getUpdatingItem, deleteRelatedItems };

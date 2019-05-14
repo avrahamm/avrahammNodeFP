@@ -15,16 +15,16 @@ DB.connectAndFetchData()
     });
 
 const UserModel = require('./models/userModel');
-const userHelper = require('./routes/helpers/userHelper');
-const userRouter = require('./routes/resourceRoute')(UserModel,userHelper);
+const UserHelper = require('./routes/helpers/userHelper');
+const userRouter = require('./routes/resourceRoute')(UserModel,UserHelper);
 
 const TodoModel = require('./models/todoModel');
 const TodoHelper = require('./routes/helpers/todoHelper');
 const todoRouter = require('./routes/resourceRoute')(TodoModel,TodoHelper);
 
-const postModel = require('./models/postModel');
+const PostModel = require('./models/postModel');
 const PostHelper = require('./routes/helpers/postHelper');
-const postRouter = require('./routes/resourceRoute')(postModel,PostHelper);
+const postRouter = require('./routes/resourceRoute')(PostModel,PostHelper);
 
 app.use('/api/v1/users',userRouter);
 app.use('/api/v1/todos',todoRouter);

@@ -1,5 +1,6 @@
-const express = require('express');
+ const express = require('express');
 
+const ValidationMiddleware = require('./helpers/validationMiddleware');
 const LogHelper = require('../utils/LogHelper');
 
 function routes(ItemModel, ItemHelper) {
@@ -13,17 +14,13 @@ function routes(ItemModel, ItemHelper) {
         });
     });
 
+    ItemRouter.use('/:id', (req, resp, next) => {
+        return ValidationMiddleware.validateItem(req, resp, next, ItemModel)
+    } );
+    ItemRouter.use('/', [ValidationMiddleware.validateRelatedUser]);
+
     ItemRouter.route('/:id').get(function (req, resp) {
-        ItemModel.findById(req.params.id, {},{},
-            (err, item) => {
-            if (err) {
-                return resp.send(err);
-            }
-            if (item) {
-                return resp.json(item);
-            }
-            return resp.sendStatus(404);
-        });
+        return resp.json(req.item);
     });
 
     /**
@@ -31,9 +28,13 @@ function routes(ItemModel, ItemHelper) {
      */
     ItemRouter.route('/').post(function (req, resp) {
         const newItem = ItemHelper.getNewItem(req,ItemModel); //Item specific structure
+        let createdItem = null;
         newItem.save()
-            .then( createdItem => {
-                LogHelper.logPostAction(createdItem);
+            .then( createdDoc => {
+                createdItem = createdDoc;
+                return LogHelper.logPostAction(createdItem);
+            })
+            .then( () => {
                 return resp.json(createdItem);
             })
             .catch(err => {
@@ -46,16 +47,21 @@ function routes(ItemModel, ItemHelper) {
      */
     ItemRouter.route('/:id').put(function (req, resp) {
         const updatingObj = ItemHelper.getUpdatingItem(req); //Item specific structure
+        let updatedItem = null;
         ItemModel.findByIdAndUpdate(req.params.id,
             updatingObj,
-            {new:true,upsert: true},
-            function (err, updatedItem) {
-                if (err) {
-                    return resp.send(err);
-                }
-                LogHelper.logPutAction(updatedItem);
+            {new:true,upsert: true}
+            )
+            .then( (updatedDoc) => {
+                updatedItem = updatedDoc;
+                return LogHelper.logPutAction( req.item, updatedItem );
+            })
+            .then( () => {
                 return resp.json(updatedItem);
-            });
+            })
+            .catch(err => {
+                return resp.send(err);
+            })
     });
 
     /**
@@ -65,6 +71,8 @@ function routes(ItemModel, ItemHelper) {
 
         let key,value;
         let updatingObj = {};
+        let updatedItem = null;
+
         if( req.body._id) {
             delete req.body._id;
         }
@@ -76,27 +84,36 @@ function routes(ItemModel, ItemHelper) {
 
         ItemModel.findByIdAndUpdate(req.params.id,
             updatingObj,
-            {new:true,upsert: true},
-            function (err, updatedItem) {
-                if (err) {
-                    return resp.send(err);
-                }
-                LogHelper.logPatchAction(updatedItem);
+            {new:true,upsert: true}
+            )
+            .then( (updatedDoc) => {
+                updatedItem = updatedDoc;
+                return LogHelper.logPatchAction( req.item, updatedItem );
+            })
+            .then( () => {
                 return resp.json(updatedItem);
-            });
+            })
+            .catch(err => {
+                return resp.send(err);
+            })
     });
 
     ItemRouter.route('/:id').delete(function (req, resp) {
-        ItemModel.findByIdAndDelete(req.params.id,
-            {},
-            function (err, deletedItem) {
-                if (err) {
-                    return resp.send(err);
-                }
-                ItemHelper.deleteRelatedItems(req);
-                LogHelper.logDeleteAction(deletedItem);
+        let deletedItem = null;
+        ItemModel.findByIdAndDelete(req.params.id,{})
+            .then( (deletedDoc) => {
+                deletedItem = deletedDoc;
+                return ItemHelper.deleteRelatedItems(req,resp);
+            } )
+            .then( () => {
+                return LogHelper.logDeleteAction(deletedItem);
+            } )
+            .then( () => {
                 return resp.json(deletedItem);
-            });
+            })
+            .catch( err => {
+                return resp.send(err);
+            } );
     });
     return ItemRouter;
 }
