@@ -14,6 +14,7 @@ function routes(ItemModel, ItemHelper) {
         });
     });
 
+    // @link:http://expressjs.com/en/4x/api.html#path-examples
     ItemRouter.use('/:id', (req, resp, next) => {
         return ValidationMiddleware.validateItem(req, resp, next, ItemModel)
     } );
@@ -27,18 +28,22 @@ function routes(ItemModel, ItemHelper) {
      * POST will create new item with predefined item fields set only.
      */
     ItemRouter.route('/').post(function (req, resp) {
-        const newItem = ItemHelper.getNewItem(req,ItemModel); //Item specific structure
+        // const newItem = ItemHelper.getNewItem(req, resp, ItemModel); //Item specific structure
         let createdItem = null;
-        newItem.save()
+
+        ItemHelper.getNewItem(req, resp, ItemModel)
+            .then(newItem => {
+                return newItem.save();
+            })
             .then( createdDoc => {
                 createdItem = createdDoc;
-                return LogHelper.logPostAction(createdItem);
+                return LogHelper.logChange( ItemHelper, null, createdItem );
             })
             .then( () => {
                 return resp.json(createdItem);
             })
             .catch(err => {
-                return resp.send(err);
+                resp.send(err);
             })
     });
 
@@ -46,21 +51,25 @@ function routes(ItemModel, ItemHelper) {
      * PUT will replace predefined item fields set only.
      */
     ItemRouter.route('/:id').put(function (req, resp) {
-        const updatingObj = ItemHelper.getUpdatingItem(req); //Item specific structure
         let updatedItem = null;
-        ItemModel.findByIdAndUpdate(req.params.id,
-            updatingObj,
-            {new:true,upsert: true}
-            )
+        // const updatingObj = ItemHelper.getUpdatingItem(req, resp); //Item specific structure
+
+        ItemHelper.getUpdatingItem( req, resp )
+            .then(updatingObj => {
+                return ItemModel.findByIdAndUpdate(req.params.id,
+                    updatingObj,
+                    {new:true,upsert: true}
+                )
+            })
             .then( (updatedDoc) => {
                 updatedItem = updatedDoc;
-                return LogHelper.logPutAction( req.item, updatedItem );
+                return LogHelper.logChange( ItemHelper, req.item, updatedItem );
             })
             .then( () => {
                 return resp.json(updatedItem);
             })
             .catch(err => {
-                return resp.send(err);
+                resp.send(err);
             })
     });
 
@@ -88,7 +97,7 @@ function routes(ItemModel, ItemHelper) {
             )
             .then( (updatedDoc) => {
                 updatedItem = updatedDoc;
-                return LogHelper.logPatchAction( req.item, updatedItem );
+                return LogHelper.logChange( ItemHelper, req.item, updatedItem );
             })
             .then( () => {
                 return resp.json(updatedItem);
@@ -106,7 +115,7 @@ function routes(ItemModel, ItemHelper) {
                 return ItemHelper.deleteRelatedItems(req,resp);
             } )
             .then( () => {
-                return LogHelper.logDeleteAction(deletedItem);
+                return LogHelper.logChange( ItemHelper, deletedItem, null );
             } )
             .then( () => {
                 return resp.json(deletedItem);

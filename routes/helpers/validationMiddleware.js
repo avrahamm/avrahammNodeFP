@@ -16,6 +16,7 @@ function validateItem(req, resp, next, ItemModel) {
 
     let itemId = req.params.id;
     if (!validateObjectId(itemId)) {
+        //@link:https://stackoverflow.com/questions/6123425/rest-response-code-for-invalid-data
         return resp.status(400).send("Illegal Id");
     }
 
@@ -51,6 +52,11 @@ function validateRelatedUser(req, resp, next) {
         return resp.status(400).send("Illegal related UserId");
     } else {
         relatedUserId = req.body.userId;
+    }
+
+    if( req.item && ( (req.item.userId).toString() !== relatedUserId ) ) {
+        return resp.status(422)
+            .send("Trying to change Item UserId is Illegal!");
     }
 
     UserModel.findById(relatedUserId, {}, {})

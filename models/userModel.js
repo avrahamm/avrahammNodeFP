@@ -13,4 +13,14 @@ let usersSchema = new Schema({
     company: Object,
 });
 
+if (!usersSchema.options.toObject) {
+    usersSchema.options.toObject = {};
+}
+
+usersSchema.options.toObject.transform = function (doc, ret, options) {
+    // remove the __v of every document before returning the result
+    delete ret.__v;
+    return ret;
+};
+
 module.exports = mongoose.model('users',usersSchema);
