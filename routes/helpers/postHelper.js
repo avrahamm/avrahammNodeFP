@@ -56,10 +56,19 @@ function validateUpdatingItem( req,resp ) {
     }
 }
 
-function deleteRelatedItems(req,resp) {}
+async function deleteRelatedItems(req,resp) {
+    // log item deletion in related user file log
+    return true;
+}
 
 function getUserId( resultItem ) {
     return resultItem.userId.toString();
 }
 
-module.exports = { getNewItem, validateUpdatingItem, getUpdatingItem, deleteRelatedItems, getUserId };
+function getItemResourceUri( ) {
+    return "api/v1/posts";
+}
+
+module.exports = { getNewItem, validateUpdatingItem,
+    getUpdatingItem, deleteRelatedItems,
+    getUserId, getItemResourceUri };

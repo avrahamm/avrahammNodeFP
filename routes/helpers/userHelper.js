@@ -59,11 +59,18 @@ function validateUpdatingItem( req,resp ) {
     }
 }
 
-function deleteRelatedItems(req,resp) {
+async function deleteRelatedItems(req,resp) {
     // User specific
     return TodoModel.deleteMany({userId: req.params.id })
         .then( () => {
             return PostModel.deleteMany({userId: req.params.id })
+        })
+        .then( () => {
+            return PostModel.deleteMany({userId: req.params.id })
+        })
+        .then( () => {
+            // user and user related items were deleted,delete log file
+            return false;
         })
         .catch( err => {
             return resp.send(err);
@@ -74,4 +81,10 @@ function getUserId( resultItem ) {
     return resultItem._id.toString();
 }
 
-module.exports = { getNewItem, validateUpdatingItem, getUpdatingItem, deleteRelatedItems, getUserId };
+function getItemResourceUri( ) {
+    return "api/v1/users";
+}
+
+module.exports = { getNewItem, validateUpdatingItem,
+    getUpdatingItem, deleteRelatedItems,
+    getUserId, getItemResourceUri };

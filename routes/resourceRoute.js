@@ -10,7 +10,15 @@ function routes(ItemModel, ItemHelper) {
             if (err) {
                 return resp.send(err);
             }
-            return resp.json(items);
+
+            const returnItems = items.map((item) => {
+                const transformedItem = item.toObject();
+                transformedItem.links = {};
+                transformedItem.links.self =
+                    `http://${req.headers.host}/${ItemHelper.getItemResourceUri()}/${item._id}`;
+                return transformedItem;
+            });
+            return resp.json(returnItems);
         });
     });
 
@@ -21,7 +29,7 @@ function routes(ItemModel, ItemHelper) {
     ItemRouter.use('/', [ValidationMiddleware.validateRelatedUser]);
 
     ItemRouter.route('/:id').get(function (req, resp) {
-        return resp.json(req.item);
+        return resp.json(req.item.toObject());
     });
 
     /**
@@ -40,7 +48,7 @@ function routes(ItemModel, ItemHelper) {
                 return LogHelper.logChange( ItemHelper, null, createdItem );
             })
             .then( () => {
-                return resp.json(createdItem);
+                return resp.json(createdItem.toObject());
             })
             .catch(err => {
                 resp.send(err);
@@ -66,7 +74,7 @@ function routes(ItemModel, ItemHelper) {
                 return LogHelper.logChange( ItemHelper, req.item, updatedItem );
             })
             .then( () => {
-                return resp.json(updatedItem);
+                return resp.json(updatedItem.toObject());
             })
             .catch(err => {
                 resp.send(err);
@@ -100,7 +108,7 @@ function routes(ItemModel, ItemHelper) {
                 return LogHelper.logChange( ItemHelper, req.item, updatedItem );
             })
             .then( () => {
-                return resp.json(updatedItem);
+                return resp.json(updatedItem.toObject());
             })
             .catch(err => {
                 return resp.send(err);
@@ -114,11 +122,11 @@ function routes(ItemModel, ItemHelper) {
                 deletedItem = deletedDoc;
                 return ItemHelper.deleteRelatedItems(req,resp);
             } )
-            .then( () => {
-                return LogHelper.logChange( ItemHelper, deletedItem, null );
+            .then( (needToLog) => {
+                return LogHelper.logChange(ItemHelper, deletedItem, null, needToLog);
             } )
             .then( () => {
-                return resp.json(deletedItem);
+                return resp.json(deletedItem.toObject());
             })
             .catch( err => {
                 return resp.send(err);

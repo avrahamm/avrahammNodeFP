@@ -50,8 +50,15 @@ function getLogUpdateDate() {
     return new Date(Date.now()).toLocaleString();
 }
 
-async function logChange(ItemHelper, originalItem, newItem ) {
-    let userId = ItemHelper.getUserId( newItem );
+async function logChange(ItemHelper, originalItem, newItem, needToLog = true ) {
+    let curItem = originalItem ? originalItem : newItem;
+    let userId = ItemHelper.getUserId( curItem );
+
+    // no need to log, delete log file
+    if( needToLog === false ) {
+        return deleteLogFile(userId);
+    }
+
     let logFileName = getUserChangesLogFileName( userId );
     let curDate = getLogUpdateDate();
     let newLogItem = {
@@ -69,6 +76,15 @@ async function logChange(ItemHelper, originalItem, newItem ) {
         .catch(err => {
             console.error(err)
         })
+}
+
+function deleteLogFile(userId) {
+    let logFileName = getUserChangesLogFileName( userId );
+    return fs.remove(logFileName)
+        .catch(err => {
+            console.error(err)
+        })
+
 }
 
 module.exports = { initUserLogFiles, logChange };
