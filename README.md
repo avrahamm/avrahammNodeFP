@@ -46,11 +46,12 @@ There are 4 restful resources: <br/>
 - 6) npm install - to install dependencies.
 - 7) npm start , in server.js local server is set to listen on PORT 8002.
 - 8) Open Postman, the urls on your local will be
-http://localhost:8002/api/v1/users
-http://localhost:8002/api/v1/todos
-http://localhost:8002/api/v1/posts
-http://localhost:8002/api/v1/phones
-configure VERBS and request data and try.
+     - http://localhost:8002/api/v1/users
+     - http://localhost:8002/api/v1/todos
+     - http://localhost:8002/api/v1/posts
+     - http://localhost:8002/api/v1/phones
+     </br>
+     configure VERBS and request data and try.
 </p>
 
 
