@@ -26,9 +26,14 @@ const PostModel = require('./models/postModel');
 const PostHelper = require('./routes/helpers/postHelper');
 const postRouter = require('./routes/resourceRoute')(PostModel,PostHelper);
 
-app.use('/api/v1/users',userRouter);
-app.use('/api/v1/todos',todoRouter);
-app.use('/api/v1/posts',postRouter);
+const PhoneModel = require('./models/phoneModel');
+const PhoneHelper = require('./routes/helpers/phoneHelper');
+const phoneRouter = require('./routes/resourceRoute')(PhoneModel,PhoneHelper);
+
+app.use(`/${UserHelper.getItemResourceUri()}`,userRouter);
+app.use(`/${TodoHelper.getItemResourceUri()}`,todoRouter);
+app.use(`/${PostHelper.getItemResourceUri()}`,postRouter);
+app.use(`/${PhoneHelper.getItemResourceUri()}`,phoneRouter);
 
 const server = app.listen(8002);
 console.log('Server is running...');

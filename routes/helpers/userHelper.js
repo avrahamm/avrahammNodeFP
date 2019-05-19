@@ -1,5 +1,6 @@
 const TodoModel = require('../../models/todoModel');
 const PostModel = require('../../models/postModel');
+const PhoneModel = require('../../models/phoneModel');
 
 function getNewItem( req, resp, ItemModel ) {
     return getUpdatingItem( req, resp)
@@ -66,7 +67,7 @@ async function deleteRelatedItems(req,resp) {
             return PostModel.deleteMany({userId: req.params.id })
         })
         .then( () => {
-            return PostModel.deleteMany({userId: req.params.id })
+            return PhoneModel.deleteMany({userId: req.params.id })
         })
         .then( () => {
             // user and user related items were deleted,delete log file
