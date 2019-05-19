@@ -19,7 +19,7 @@ There are 4 restful resources: <br/>
 </p>
 
 <p>
-## Prerequisites : you need to install
+     <b>Prerequisites</b> : you need to install
 - Node 
 - MongoDB 
 - Robo visual tool - reccomended.
@@ -27,7 +27,11 @@ There are 4 restful resources: <br/>
 </p>
 
 <p>
-## Steps to reproduce.
+<p>
+     <b>Functionality: </b>
+ HTTP VERBS GET, POST, PUT, PATCH, DELETE on each resource.  
+</p>
+     <b>Steps to reproduce</b>.
 
 - 1) Create directory Node - or whatever name you want, cd Node
 - 2) Inside there create directory changeLogs - name is important <br/>
@@ -40,10 +44,13 @@ There are 4 restful resources: <br/>
 - 4) Clone: git clone https://github.com/avrahamm/avrahammNodeFP.git 
 - 5) get into the directory, cd avrahammNodeFP
 - 6) npm install - to install dependencies.
-- 7) npm start
+- 7) npm start , in server.js local server is set to listen on PORT 8002.
+- 8) Open Postman, the urls on your local will be
+http://localhost:8002/api/v1/users
+http://localhost:8002/api/v1/todos
+http://localhost:8002/api/v1/posts
+http://localhost:8002/api/v1/phones
+configure VERBS and request data and try.
 </p>
 
-<p>
-  ## Functionality:
- HTTP VERBS GET, POST, PUT, PATCH, DELETE on each resource.  
-</p>
+
