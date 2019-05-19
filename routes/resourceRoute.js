@@ -1,8 +1,17 @@
- const express = require('express');
+const express = require('express');
 
 const ValidationMiddleware = require('./helpers/validationMiddleware');
 const LogHelper = require('../utils/LogHelper');
 
+/**
+ * One Router structure for all resources,
+ * customizations are made through ItemModel and ItemHelper.
+ * To avoid code repetition and yet be flexible.
+ * Also ValidationMiddleware is used to perform common validation steps.
+ * @param ItemModel
+ * @param ItemHelper
+ * @returns {Router}
+ */
 function routes(ItemModel, ItemHelper) {
     const ItemRouter = express.Router();
     ItemRouter.route('/').get(function (req, resp) {
@@ -22,10 +31,17 @@ function routes(ItemModel, ItemHelper) {
         });
     });
 
-    // @link:http://expressjs.com/en/4x/api.html#path-examples
+    /**
+     * Add ValidationMiddleware to perform validations,
+     */
     ItemRouter.use('/:id', (req, resp, next) => {
         return ValidationMiddleware.validateItem(req, resp, next, ItemModel)
     } );
+    /**
+     * if needed several validations can be added for each url -
+     * in array notation. [ v1,v2...]
+     * @link:http://expressjs.com/en/4x/api.html#path-examples
+     */
     ItemRouter.use('/', [ValidationMiddleware.validateRelatedUser]);
 
     ItemRouter.route('/:id').get(function (req, resp) {

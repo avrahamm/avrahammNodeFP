@@ -1,3 +1,9 @@
+/**
+ * LogHelper is used to manage log files log changes
+ * for user and its related items.
+ *
+ */
+
 const path = require('path');
 const os = require('os');
 const fs = require('fs-extra');
@@ -50,6 +56,15 @@ function getLogUpdateDate() {
     return new Date(Date.now()).toLocaleString();
 }
 
+/**
+ * To write to the log ss specified in API definition,
+ * or delete log file on DELETE user.
+ * @param ItemHelper
+ * @param originalItem
+ * @param newItem
+ * @param needToLog
+ * @returns {Promise<* | *>}
+ */
 async function logChange(ItemHelper, originalItem, newItem, needToLog = true ) {
     let curItem = originalItem ? originalItem : newItem;
     let userId = ItemHelper.getUserId( curItem );

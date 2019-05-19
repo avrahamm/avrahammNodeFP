@@ -60,6 +60,13 @@ function validateUpdatingItem( req,resp ) {
     }
 }
 
+/**
+ * To delete user related items ( todos, posts, phones,..)
+ * and return false notifies to delete user log file.
+ * @param req
+ * @param resp
+ * @returns {Promise<boolean | *>}
+ */
 async function deleteRelatedItems(req,resp) {
     // User specific
     return TodoModel.deleteMany({userId: req.params.id })
