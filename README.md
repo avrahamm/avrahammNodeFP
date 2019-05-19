@@ -11,8 +11,11 @@ The data is taken from
 - https://jsonplaceholder.typicode.com/posts
 
 and fetched and stored in MongoDB in 3 respective collections.
-There are 4 restful resources:
-users, todos, posts, phones.
+There are 4 restful resources: <br/>
+- users, 
+- todos, 
+- posts, 
+- phones.
 </p>
 
 <p>
@@ -27,12 +30,13 @@ users, todos, posts, phones.
 ## Steps to reproduce.
 
 - 1) Create directory Node - or whatever name you want, cd Node
-- 2) Inside there create directory changeLogs - name is important as it is defined as constant in code
-nodefp/utils/LogHelper.js, function getLogFolder
-const LogFolderName = "/changeLogs";
+- 2) Inside there create directory changeLogs - name is important <br/>
+     as it is defined as constant in code: <br/>
+     nodefp/utils/LogHelper.js, function getLogFolder
+     const LogFolderName = "/changeLogs";
 - 3) In MongoDb create Database nodefpDB - name is important.
-nodefp/utils/DB.js file holds 
-const MONGODB_CONNECTION_PATH = 'mongodb://localhost:27017/nodefpDB';
+    nodefp/utils/DB.js file holds <br/>
+    const MONGODB_CONNECTION_PATH = 'mongodb://localhost:27017/nodefpDB';
 - 4) Clone: git clone https://github.com/avrahamm/avrahammNodeFP.git 
 - 5) get into the directory, cd avrahammNodeFP
 - 6) npm install - to install dependencies.
