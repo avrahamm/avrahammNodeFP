@@ -1,5 +1,4 @@
 # avrahammNodeFP
-Description:
 There is RESTful API for Users management written in Nodejs/Express and MongoDB/mongoose.
 
 ## Description:
@@ -10,7 +9,7 @@ The data is taken from
 - https://jsonplaceholder.typicode.com/todos
 - https://jsonplaceholder.typicode.com/posts
 
-and fetched and stored in MongoDB in 3 respective collections.
+and stored in MongoDB in 3 respective collections.
 There are 4 restful resources: <br/>
 - users, 
 - todos, 
@@ -26,7 +25,6 @@ There are 4 restful resources: <br/>
 - Postman to try the application. 
 </p>
 
-<p>
 <p>
      <b>Functionality: </b>
  HTTP VERBS GET, POST, PUT, PATCH, DELETE on each resource.  
