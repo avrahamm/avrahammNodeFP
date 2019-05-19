@@ -6,6 +6,8 @@ const todoModel = require('../models/todoModel');
 const postModel = require('../models/postModel');
 const LogHelper = require('./LogHelper');
 
+const MONGODB_CONNECTION_PATH = 'mongodb://localhost:27017/nodefpDB';
+
 function connectAndFetchData() {
     return connectToDB()
         .then( () => {
@@ -31,7 +33,7 @@ function connectAndFetchData() {
 }
 
 function connectToDB() {
-    return mongoose.connect('mongodb://localhost:27017/nodefpDB',
+    return mongoose.connect(MONGODB_CONNECTION_PATH,
         {useNewUrlParser: true})
         .then( () => {
             console.log('Mongoose connected!');
