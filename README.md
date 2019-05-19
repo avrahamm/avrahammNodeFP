@@ -49,7 +49,7 @@ There are 4 restful resources: <br/>
      - http://localhost:8002/api/v1/posts
      - http://localhost:8002/api/v1/phones
      </br>
-     configure VERBS and request data and try.
+     configure HTTP VERBS and request data and try.
 </p>
 
 
